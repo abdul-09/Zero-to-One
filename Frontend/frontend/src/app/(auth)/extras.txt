@@ -1,0 +1,26 @@
+<div className="bg-gray-100 w-64 p-2 flex items-center mb-3">
+                            <label className="text-gray-400 mr-2 text-sm">Experience Level:</label>
+                                    <select className="text-sm" id="exeprience" name="experience">
+                                    <option value="beginner">Beginner</option>
+                                    <option value="intermidiate">Intermediate</option>
+                                    <option value="experienced">Experienced</option>
+                                    </select>
+                            </div>
+                            <div className="bg-gray-100 w-64 p-2 flex items-center mb-3">
+                            
+                            <label className="flex text-xs"><input type="checkbox" 
+                                name="remember" className="mr-1 font-sans"/>Farming Basics</label>
+                            <label className="flex text-xs"><input type="checkbox" 
+                                name="remember" className="mr-1 font-sans"/>Virtual Farming</label>
+                            <label className="flex  text-xs"><input type="checkbox" 
+                                name="remember" className="mr-1 font-sans"/>Smart Farming tools</label>
+                            <label className="flex text-xs"><input type="checkbox" 
+                                name="remember" className="mr-1 font-sans"/>Sustainable Farming</label> 
+                            </div>
+
+
+ <div className="bg-gray-100 w-64 p-2 flex items-center mb-3">
+                                <FaPhoneVolume className="text-gray-400 mr-2" />
+                                <input type="text" name="phone" placeholder="Phone Number" 
+                                className="bg-gray-100 outline-none text-sm flex-1" />
+                            </div>
