@@ -14,8 +14,8 @@ from django.utils.http import urlsafe_base64_decode
 from django.utils.encoding import force_bytes
 from rest_framework import generics
 
-from .models import User
-from .serializers import RegisterSerializer, UserSerializer
+from .models import User, InterestedTopic
+from .serializers import RegisterSerializer, UserSerializer, UserDashboardSerializer
 
 class RegisterView(generics.CreateAPIView):
     queryset = User.objects.all()
@@ -24,6 +24,7 @@ class RegisterView(generics.CreateAPIView):
 
 class UserDetailView(generics.RetrieveUpdateAPIView):
     queryset = User.objects.all()
+    permission_classes = (IsAuthenticated,)
     serializer_class = UserSerializer
 
     def get_object(self):
@@ -99,3 +100,34 @@ class PasswordResetConfirmView(APIView):
         user.save()
 
         return Response({'message': 'Password has been reset successfully.'}, status=status.HTTP_200_OK)
+
+class DashboardView(generics.RetrieveAPIView):
+    """
+    Retrieve the dashboard data for the authenticated user.
+    """
+    permission_classes = [IsAuthenticated]
+    serializer_class = UserDashboardSerializer
+
+    def get_object(self):
+        return self.request.user
+
+class EnrollTopicView(APIView):
+    """
+    Enroll the authenticated user in a specified topic.
+    """
+    permission_classes = [IsAuthenticated]
+
+    def post(self, request, topic_id):
+        user = request.user
+        try:
+            topic = InterestedTopic.objects.get(id=topic_id)
+        except InterestedTopic.DoesNotExist:
+            return Response({"error": "Topic does not exist."}, status=status.HTTP_404_NOT_FOUND)
+        
+        # Check if already enrolled
+        if user.interested_topics.filter(id=topic_id).exists():
+            return Response({"message": "Already enrolled in this topic."}, status=status.HTTP_400_BAD_REQUEST)
+        
+        # Enroll the user
+        user.interested_topics.add(topic)
+        return Response({"message": "Successfully enrolled in the topic."}, status=status.HTTP_200_OK)

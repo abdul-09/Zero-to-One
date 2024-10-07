@@ -47,4 +47,21 @@ class User(AbstractBaseUser, PermissionsMixin):
     def __str__(self):
         return self.full_name
 
+class TrainingSchedule(models.Model):
+    topic = models.ForeignKey(InterestedTopic, on_delete=models.CASCADE, related_name='training_schedules')
+    title = models.CharField(max_length=255)
+    description = models.TextField()
+    start_time = models.DateTimeField()
+
+    def __str__(self):
+        return self.title
+
+class Resource(models.Model):
+    topic = models.ForeignKey(InterestedTopic, on_delete=models.CASCADE, related_name='resources')
+    title = models.CharField(max_length=255)
+    description = models.TextField()
+    link = models.URLField()
+
+    def __str__(self):
+        return self.title
 

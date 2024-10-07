@@ -1,0 +1,18 @@
+{% extends 'admin/base_site.html' %}
+
+{% block content %}
+  <h1>Send Bulk Email</h1>
+  <p>Send an email to the following users:</p>
+  <ul>
+    {% for user in users %}
+      <li>{{ user.full_name }} ({{ user.email }})</li>
+    {% endfor %}
+  </ul>
+
+  <form method="post">{% csrf_token %}
+    {{ form.as_p }}
+    <input type="submit" name="apply" value="Send Email">
+  </form>
+
+  <a href="{{ request.META.HTTP_REFERER }}">Back</a>
+{% endblock %}
