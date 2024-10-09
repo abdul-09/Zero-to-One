@@ -1,6 +1,8 @@
 from rest_framework import serializers
 from .models import User, InterestedTopic, Resource, TrainingSchedule
 from django.contrib.auth.password_validation import validate_password
+from drf_recaptcha.fields import ReCaptchaV2Field
+
 
 class InterestedTopicSerializer(serializers.ModelSerializer):
     class Meta:
@@ -15,14 +17,16 @@ class UserSerializer(serializers.ModelSerializer):
         model = User
         fields = ['id', 'full_name', 'email', 'phone_number', 'location', 'experience_level', 'interested_topics']
 
-class RegisterSerializer(serializers.ModelSerializer):
+class RegisterSerializer(serializers.Serializer):
+    full_name = serializers.CharField(required=True)
+    email = serializers.EmailField(required=True)
     password = serializers.CharField(write_only=True, required=True, validators=[validate_password])
     confirm_password = serializers.CharField(write_only=True, required=True)
-    interested_topics = serializers.PrimaryKeyRelatedField(queryset=InterestedTopic.objects.all(), many=True)
+    captcha = ReCaptchaV2Field()
 
     class Meta:
         model = User
-        fields = ['email', 'full_name', 'phone_number', 'location', 'experience_level', 'interested_topics', 'password', 'confirm_password',]
+        fields = ['full_name', 'email', 'password', 'confirm_password', 'captcha']
 
     def validate(self, attrs):
         if attrs['password'] != attrs['confirm_password']:
@@ -30,12 +34,24 @@ class RegisterSerializer(serializers.ModelSerializer):
         return attrs
 
     def create(self, validated_data):
-        validated_data.pop('confirm_password')
-        interested_topics = validated_data.pop('interested_topics')
+        validated_data.pop('confirm_password')  # Remove confirm_password from the validated_data
+        validated_data.pop('captcha')
         user = User.objects.create_user(**validated_data)
-        user.interested_topics.set(interested_topics)
-        user.save()
         return user
+
+class ProfileUpdateSerializer(serializers.ModelSerializer):
+    interested_topics = serializers.PrimaryKeyRelatedField(queryset=InterestedTopic.objects.all(), many=True)
+
+    class Meta:
+        model = User
+        fields = ['phone_number', 'location', 'experience_level', 'interested_topics']
+
+    def update(self, instance, validated_data):
+        interested_topics = validated_data.pop('interested_topics', None)
+        instance = super().update(instance, validated_data)
+        if interested_topics:
+            instance.interested_topics.set(interested_topics)
+        return instance
 
 class TrainingScheduleSerializer(serializers.ModelSerializer):
     class Meta:

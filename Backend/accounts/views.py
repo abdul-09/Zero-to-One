@@ -1,13 +1,24 @@
 # views.py
+from django.shortcuts import render
+from django.views import View
+import requests
+from django.urls import reverse
 from rest_framework_simplejwt.views import TokenObtainPairView
 from rest_framework_simplejwt.tokens import RefreshToken
 from rest_framework.permissions import AllowAny
 from rest_framework.response import Response
 from rest_framework import status
 from rest_framework.views import APIView
+from allauth.socialaccount.providers.google.views import GoogleOAuth2Adapter
+from allauth.socialaccount.providers.oauth2.client import OAuth2Client
+from dj_rest_auth.registration.views import SocialLoginView
+from google.auth.transport import requests as google_requests
+from google.oauth2 import id_token
 from rest_framework.permissions import IsAuthenticated
 from django.contrib.auth.tokens import PasswordResetTokenGenerator
+from django.conf import settings
 from django.core.mail import send_mail
+from urllib.parse import urljoin
 from django.contrib.auth import logout
 from django.utils.http import urlsafe_base64_encode
 from django.utils.http import urlsafe_base64_decode
@@ -15,17 +26,17 @@ from django.utils.encoding import force_bytes
 from rest_framework import generics
 
 from .models import User, InterestedTopic
-from .serializers import RegisterSerializer, UserSerializer, UserDashboardSerializer
+from .serializers import ProfileUpdateSerializer, RegisterSerializer, UserDashboardSerializer
 
 class RegisterView(generics.CreateAPIView):
     queryset = User.objects.all()
     permission_classes = [AllowAny]
     serializer_class = RegisterSerializer
 
-class UserDetailView(generics.RetrieveUpdateAPIView):
+class ProfileUpdateView(generics.RetrieveUpdateAPIView):
     queryset = User.objects.all()
-    permission_classes = (IsAuthenticated,)
-    serializer_class = UserSerializer
+    permission_classes = [IsAuthenticated]
+    serializer_class = ProfileUpdateSerializer
 
     def get_object(self):
         return self.request.user
@@ -33,7 +44,82 @@ class UserDetailView(generics.RetrieveUpdateAPIView):
 class LoginView(TokenObtainPairView):
     permission_classes = (AllowAny,)
 
+class GoogleLoginView(SocialLoginView):
+    permission_classes = [AllowAny]
 
+    adapter_class = GoogleOAuth2Adapter
+    callback_url = settings.GOOGLE_OAUTH_CALLBACK_URL
+    client_class = OAuth2Client
+
+class GoogleLoginCallback(APIView):
+    def get(self, request, *args, **kwargs):
+        """
+        This endpoint will handle the OAuth2 code exchange and return the JWT tokens.
+        Ensure the 'code' from Google is exchanged for access and refresh tokens.
+        """
+
+        code = request.GET.get("code")
+
+        if not code:
+            return Response({"error": "No code provided"}, status=status.HTTP_400_BAD_REQUEST)
+
+        # Exchange the authorization code for tokens
+       
+        # Instantiate the OAuth2 client and exchange the code
+
+        token_endpoint_url = 'https://oauth2.googleapis.com/token'
+        data = {
+                'code': code,
+                'client_id': settings.GOOGLE_OAUTH_CLIENT_ID,
+                'client_secret': settings.GOOGLE_OAUTH_CLIENT_SECRET,
+                'redirect_uri': settings.GOOGLE_OAUTH_CALLBACK_URL,
+                'grant_type': 'authorization_code',
+            }
+
+            # Make a request to the token endpoint
+        response = requests.post(token_endpoint_url, data=data)
+        if response.status_code != 200:
+            return Response({"error": "Failed to fetch token."}, status=response.status_code)
+            
+        tokens = response.json()
+        id_token_google = tokens.get('id_token')
+
+        try:
+                # Step 2: Verify Google ID Token
+                idinfo = id_token.verify_oauth2_token(id_token_google, google_requests.Request(), settings.GOOGLE_OAUTH_CLIENT_ID)
+
+                # Get the user’s email from the token (or any other information you need)
+                email = idinfo.get('email')
+
+                # Step 3: Generate your own JWT token (or login the user)
+                # This assumes you're using Django Simple JWT or similar
+                user, _ = User.objects.get_or_create(email=email)  # Replace with your user model logic
+
+                # Generate JWT for your application
+                refresh = RefreshToken.for_user(user)
+                jwt_tokens = {
+                    'refresh': str(refresh),
+                    'access': str(refresh.access_token),
+                }
+
+                # Return your app's JWT tokens
+                return Response(jwt_tokens, status=status.HTTP_200_OK)
+
+        except ValueError:
+            # Invalid token
+            return Response({"error": "Invalid ID token"}, status=status.HTTP_400_BAD_REQUEST)
+    
+class LoginPage(View):
+    def get(self, request, *args, **kwargs):
+        return render(
+            request,
+            "pages/login.html",
+            {
+                "google_callback_uri": settings.GOOGLE_OAUTH_CALLBACK_URL,
+                "google_client_id": settings.GOOGLE_OAUTH_CLIENT_ID,
+            },
+        )
+        
 class LogoutView(APIView):
     permission_classes = (IsAuthenticated,)
 

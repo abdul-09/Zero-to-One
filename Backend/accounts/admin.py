@@ -5,8 +5,11 @@ from django.core.mail import send_mail
 from django.urls import path
 from django.shortcuts import render, redirect
 from django.http import HttpResponse
+
+from .tasks import email_users
 from .forms import BulkEmailForm
 from django.conf import settings
+from django.contrib import messages
 from .models import Resource, TrainingSchedule, User, InterestedTopic
 
 # Register your models here.
@@ -44,7 +47,7 @@ def export_users_to_csv(modeladmin, request, queryset):
 
     return response
 
-@admin.register(User)
+
 class UserAdmin(admin.ModelAdmin):
     list_display = ('id', 'full_name', 'email', 'location', 'experience_level')
     search_fields = ('full_name', 'email')
@@ -56,37 +59,22 @@ class UserAdmin(admin.ModelAdmin):
         """Admin action to send bulk emails with a form for subject and message."""
         
         if 'apply' in request.POST:
-            # Form submission case
-            form = BulkEmailForm(request.POST)
+            form = SendEmailForm(request.POST)
             if form.is_valid():
+                users = form.cleaned_data['users']
                 subject = form.cleaned_data['subject']
                 message = form.cleaned_data['message']
-                from_email = "no-reply@zero-to-one-farming.com"
-                recipient_list = list(queryset.values_list('email', flat=True))
-
-                # Send the email
-                send_mail(
-                    subject,
-                    message,
-                    from_email,  # From email address
-                    recipient_list,  # List of recipients
-                    fail_silently=False,
-                )
-
-                # Display a success message in the admin interface
-                self.message_user(request, f"Emails sent successfully to {len(recipient_list)} users.")
-                return redirect(request.get_full_path())
-            else:
-                # Form is invalid, print errors (you can log or handle it differently)
-                self.message_user(request, f"Form is invalid: {form.errors}")
+                email_users.delay(users, subject, message)
+                messages.success(request, f'Emails sent to {queryset.count()} users.')
+                return redirect('admin:users_user_changelist')
         else:
-            # Initial request, display the form to the admin
-            form = BulkEmailForm()
+            form = SendEmailForm(initial={'users': queryset})
 
-        # Render a custom template with the form
-        return render(request, 'admin/send_bulk_email.html', {'form': form, 'users': queryset})
+        return render(request, 'admin/send_email.html', {'form': form, 'users': queryset})
 
-# admin.site.register(User)
+    send_bulk_email.short_description = "Send email to selected users"
+
+admin.site.register(User, UserAdmin)
 admin.site.register(InterestedTopic)
 admin.site.register(Resource)
 admin.site.register(TrainingSchedule)

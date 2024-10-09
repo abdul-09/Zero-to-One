@@ -1,18 +1,39 @@
-{% extends 'admin/base_site.html' %}
+{% extends "admin/base_site.html" %}
+{% load i18n static %}
 
 {% block content %}
-  <h1>Send Bulk Email</h1>
-  <p>Send an email to the following users:</p>
-  <ul>
-    {% for user in users %}
-      <li>{{ user.full_name }} ({{ user.email }})</li>
-    {% endfor %}
-  </ul>
+  <h2>{% trans "Send email to selected users" %}</h2>
+  <p>{% trans "Please review the selected users and fill in the email details." %}</p>
 
-  <form method="post">{% csrf_token %}
-    {{ form.as_p }}
-    <input type="submit" name="apply" value="Send Email">
+  <form method="POST">
+    {% csrf_token %}
+    <div>
+      <div>
+        <p>{{ form.users.errors }}</p>
+        <p>{{ form.users.label_tag }}</p>
+        <p>
+          {% for user in form.users.initial %}
+            {{ user.email }}{% if not forloop.last %},&nbsp;{% endif %}
+          {% endfor %}
+        </p>
+        <select name="users" multiple style="display: none">
+          {% for user in form.users.initial %}
+            <option value="{{ user.id }}" selected>{{ user }}</option>
+          {% endfor %}
+        </select>
+      </div>
+      <div>
+        <p>{{ form.subject.errors }}</p>
+        <p>{{ form.subject.label_tag }}</p>
+        <p>{{ form.subject }}</p>
+      </div>
+      <div>
+        <p>{{ form.message.errors }}</p>
+        <p>{{ form.message.label_tag }}</p>
+        <p>{{ form.message }}</p>
+      </div>
+      <input type="submit" name="apply" value="{% trans 'Send message' %}" />
+      <a href="{% url 'admin:users_user_changelist' %}" class="button cancel-link">{% trans "Cancel" %}</a>
+    </div>
   </form>
-
-  <a href="{{ request.META.HTTP_REFERER }}">Back</a>
 {% endblock %}
