@@ -59,7 +59,7 @@ class UserAdmin(admin.ModelAdmin):
         """Admin action to send bulk emails with a form for subject and message."""
         
         if 'apply' in request.POST:
-            form = SendEmailForm(request.POST)
+            form = BulkEmailForm(request.POST)
             if form.is_valid():
                 users = form.cleaned_data['users']
                 subject = form.cleaned_data['subject']
@@ -68,9 +68,9 @@ class UserAdmin(admin.ModelAdmin):
                 messages.success(request, f'Emails sent to {queryset.count()} users.')
                 return redirect('admin:users_user_changelist')
         else:
-            form = SendEmailForm(initial={'users': queryset})
+            form = BulkEmailForm(initial={'users': queryset})
 
-        return render(request, 'admin/send_email.html', {'form': form, 'users': queryset})
+        return render(request, 'admin/send_bulk_email.html', {'form': form, 'users': queryset})
 
     send_bulk_email.short_description = "Send email to selected users"
 

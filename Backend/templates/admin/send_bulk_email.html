@@ -33,7 +33,7 @@
         <p>{{ form.message }}</p>
       </div>
       <input type="submit" name="apply" value="{% trans 'Send message' %}" />
-      <a href="{% url 'admin:users_user_changelist' %}" class="button cancel-link">{% trans "Cancel" %}</a>
+      {% comment %} <a href="{% url 'admin:users_user_changelist' %}" class="button cancel-link">{% trans "Cancel" %}</a> {% endcomment %}
     </div>
   </form>
 {% endblock %}
