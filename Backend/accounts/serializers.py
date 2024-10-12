@@ -22,11 +22,11 @@ class RegisterSerializer(serializers.Serializer):
     email = serializers.EmailField(required=True)
     password = serializers.CharField(write_only=True, required=True, validators=[validate_password])
     confirm_password = serializers.CharField(write_only=True, required=True)
-    captcha = ReCaptchaV2Field()
+    # captcha = ReCaptchaV2Field()
 
     class Meta:
         model = User
-        fields = ['full_name', 'email', 'password', 'confirm_password', 'captcha']
+        fields = ['full_name', 'email', 'password', 'confirm_password']
 
     def validate(self, attrs):
         if attrs['password'] != attrs['confirm_password']:
@@ -35,7 +35,7 @@ class RegisterSerializer(serializers.Serializer):
 
     def create(self, validated_data):
         validated_data.pop('confirm_password')  # Remove confirm_password from the validated_data
-        validated_data.pop('captcha')
+        # validated_data.pop('captcha')
         user = User.objects.create_user(**validated_data)
         return user
 

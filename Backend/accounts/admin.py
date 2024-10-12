@@ -6,7 +6,7 @@ from django.urls import path
 from django.shortcuts import render, redirect
 from django.http import HttpResponse
 
-from .tasks import email_users
+# from .tasks import email_users
 from .forms import BulkEmailForm
 from django.conf import settings
 from django.contrib import messages
