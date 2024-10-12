@@ -11,3 +11,5 @@ requests
 google-auth
 dj-rest-auth
 drf-recaptcha
+django-cryptography==1.1
+python-decouple==3.8
