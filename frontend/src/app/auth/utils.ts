@@ -48,7 +48,7 @@ const storeToken = (token: string, type: "access" | "refresh") => {
   };
   
   const resetPassword = (email: string) => {
-    return api.post({ email }, "/reset_password/");
+    return api.post({ email }, "/reset-password/");
   };
   
   const resetPasswordConfirm = (
@@ -59,7 +59,7 @@ const storeToken = (token: string, type: "access" | "refresh") => {
   ) => {
     return api.post(
       { uid, token, new_password, re_new_password },
-      "reset_password_confirm/"
+      "password-reset-confirm/<uidb64>/<token>/"
     );
   };
 
