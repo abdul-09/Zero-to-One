@@ -80,11 +80,11 @@ const Login = () => {
                       <div className="flex justify-between w-64 mb-5">
                           <label className="flex items-center text-xs"><input type="checkbox" 
                           name="remember" className="mr-1 font-sans"/>Remember Me</label>
-                          <Link href="#" className="text-xs">Forgot Password</Link>
+                          <Link href="/auth/password/reset-password/" className="text-xs">Forgot Password</Link>
                       </div>
-                      <Link href="#" className="border-2 border-green-600 rounded-full px-12 py-2 inline-block font-semibold hover:bg-green-600
+                      <button className="border-2 border-green-600 rounded-full px-10 py-2 inline-block font-semibold hover:bg-green-600
                            hover:text-white">Login
-                      </Link>
+                      </button>
                   </div>
                   </form>
               </div>
@@ -95,7 +95,7 @@ const Login = () => {
               <h2 className="text-3xl font-bold mb-2">Welcome to Zero-to-One</h2>
               <div className="border-2 w-10 border-white inline-block mb-2"></div>
               <p className="mb-2">Create an account and start the journey with Us.</p>
-              <Link href="/auth/register" className="border-2 border-white rounded-full px-12 py-2 inline-block font-semibold hover:bg-white
+              <Link href="/auth/register" className="border-2 border-white rounded-full px-8 py-2 inline-block font-semibold hover:bg-white
                   hover:text-green-600">Sign Up
               </Link>
           </div>

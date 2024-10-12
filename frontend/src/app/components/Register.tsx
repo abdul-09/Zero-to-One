@@ -9,9 +9,9 @@ import logo from "@/app/Klima360LG.png"
 
 type FormData = {
   email: string;
-  fullnames: string;
+  full_name: string;
   password: string;
-  confirmPassword: string;
+  confirm_password: string;
 };
 
 const Register = () => {
@@ -27,15 +27,33 @@ const Register = () => {
   const { register: registerUser } = AuthActions(); // Note: Renamed to avoid naming conflict with useForm's register
 
   const onSubmit = (data: FormData) => {
-    registerUser(data.email, data.fullnames, data.password, data.confirmPassword)
+    registerUser(data.email, data.full_name, data.password, data.confirm_password)
       .json(() => {
         router.push("/");
       })
-      .catch((err) => {
-        setError("root", {
-          type: "manual",
-          message: err.json.detail,
-        });
+      .catch(async (error) => {
+        if (error.response) {
+          try {
+            const response = await error.response.json();
+            setError("root", {
+              type: "manual",
+              message: response.detail || "An error occurred during registration.",
+            });
+          } catch (jsonError) {
+            console.error("Error parsing error response:", jsonError);
+            setError("root", {
+              type: "manual",
+              message: "An error occurred during registration.",
+            });
+          }
+        } else {
+          // Handle other error types (e.g., network errors, timeout errors)
+          console.error("Network error:", error);
+          setError("root", {
+            type: "manual",
+            message: "Network error. Please try again later.",
+          });
+        }
       });
   };
   return <div className="flex items-center bg-green-200 justify-center min-h-screen py-2">
@@ -61,8 +79,8 @@ const Register = () => {
                                 <FaAddressCard className="text-gray-400 mr-2" />
                                 <input type="text" placeholder="Full Names" 
                                 className="bg-gray-100 outline-none text-sm flex-1" 
-                                {...register("fullnames", { required: "fullnames is required" })}/>
-                                {errors.fullnames && (<span className="text-xs text-red-600">{errors.fullnames.message}</span>
+                                {...register("full_name", { required: "full names is required" })}/>
+                                {errors.full_name && (<span className="text-xs text-red-600">{errors.full_name.message}</span>
             )}
                             </div>
                            
@@ -88,7 +106,7 @@ const Register = () => {
                                 <MdLockOutline className="text-gray-400 mr-2" />
                                 <input type="password" placeholder="Confirm Password" 
                                 className="bg-gray-100 outline-none text-sm flex-1" 
-                                {...register("confirmPassword", { required: "confirmPassword is required" })}/>
+                                {...register("confirm_password", { required: "confirm Password is required" })}/>
                                 
                             </div>
                            
@@ -97,7 +115,7 @@ const Register = () => {
                                 <label className="flex items-center text-xs"><input type="checkbox" 
                                 name="remember" className="mr-1 font-sans"/>Remember Me</label>
                             </div>
-                            <button className="border-2 border-green-600 rounded-full px-12 py-2 inline-block font-semibold hover:bg-green-600
+                            <button className="border-2 border-green-600 rounded-full px-8 py-2 inline-block font-semibold hover:bg-green-600
                                  hover:text-white">Register
                             </button>
                         </div>

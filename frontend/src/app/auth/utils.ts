@@ -29,26 +29,26 @@ const storeToken = (token: string, type: "access" | "refresh") => {
   
 
 
-  const register = (email: string, fullnames: string, password: string, confirmPassword: string) => {
-    return api.post({ email, fullnames, password, confirmPassword }, "/auth/users/");
+  const register = (email: string, full_name: string, password: string, confirm_password: string) => {
+    return api.post({ email, full_name, password, confirm_password }, "/register/");
   };
   
   const login = (email: string, password: string) => {
-    return api.post({ email, password }, "/auth/jwt/create");
+    return api.post({ email, password }, "/login/");
   };
   
   const logout = () => {
     const refreshToken = getToken("refresh");
-    return api.post({ refresh: refreshToken }, "/auth/logout/");
+    return api.post({ refresh: refreshToken }, "/logout/");
   };
   
   const handleJWTRefresh = () => {
     const refreshToken = getToken("refresh");
-    return api.post({ refresh: refreshToken }, "/auth/jwt/refresh");
+    return api.post({ refresh: refreshToken }, "/token/refresh");
   };
   
   const resetPassword = (email: string) => {
-    return api.post({ email }, "/auth/users/reset_password/");
+    return api.post({ email }, "/reset_password/");
   };
   
   const resetPasswordConfirm = (
@@ -59,7 +59,7 @@ const storeToken = (token: string, type: "access" | "refresh") => {
   ) => {
     return api.post(
       { uid, token, new_password, re_new_password },
-      "/auth/users/reset_password_confirm/"
+      "reset_password_confirm/"
     );
   };
 

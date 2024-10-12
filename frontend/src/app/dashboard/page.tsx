@@ -1,15 +1,15 @@
 
 "use client";
 
-import useSWR from "swr";
-import { fetcher } from "@/app/fetcher";
+// import useSWR from "swr";
+// import { fetcher } from "@/app/fetcher";
 import { AuthActions } from "@/app/auth/utils";
 import { useRouter } from "next/navigation";
 
 export default function Home() {
   const router = useRouter();
 
-  const { data: user } = useSWR("/auth/users/me", fetcher);
+  // const { data: user } = useSWR("/auth/users/me", fetcher);
 
   const { logout, removeTokens } = AuthActions();
 
@@ -28,11 +28,13 @@ export default function Home() {
   return (
     <div className="min-h-screen bg-gray-100 flex flex-col items-center justify-center">
       <div className="bg-white p-6 rounded-lg shadow-lg w-1/3 text-center">
-        <h1 className="text-2xl font-bold mb-4">Hi, {user?.fullnames}!</h1>
+        <h1 className="text-2xl font-bold mb-4">Hi, Rashid !</h1>
         <p className="mb-4">Your account details:</p>
         <ul className="mb-4">
-          <li>Username: {user?.fullnames}</li>
-          <li>Email: {user?.email}</li>
+        <li>Full Name: Rashid Ramadhan</li>
+        <li>Email: rashidramadhan08@gmail.com</li>
+          {/* <li>Username: {user?.fullnames}</li>
+          <li>Email: {user?.email}</li> */}
         </ul>
         <button
           onClick={handleLogout}
