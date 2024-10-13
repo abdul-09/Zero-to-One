@@ -32,8 +32,29 @@ const Login = () => {
 
         router.push("dashboard");
       })
-      .catch((err) => {
-        setError("root", { type: "manual", message: err.json.detail });
+      .catch(async (error) => {
+        if (error.response) {
+          try {
+            const response = await error.response.json();
+            setError("root", {
+              type: "manual",
+              message: response.detail || "An error occurred during login.",
+            });
+          } catch (jsonError) {
+            console.error("Error parsing error response:", jsonError);
+            setError("root", {
+              type: "manual",
+              message: "An error occurred during login.",
+            });
+          }
+        } else {
+          // Handle other error types (e.g., network errors, timeout errors)
+          console.error("Network error:", error);
+          setError("root", {
+            type: "manual",
+            message: "Network error. Please try again later.",
+          });
+        }
       });
   };
   return <div className="flex flex-col items-center  bg-green-200 justify-center min-h-screen py-2">
@@ -80,7 +101,7 @@ const Login = () => {
                       <div className="flex justify-between w-64 mb-5">
                           <label className="flex items-center text-xs"><input type="checkbox" 
                           name="remember" className="mr-1 font-sans"/>Remember Me</label>
-                          <Link href="/auth/password/reset-password/" className="text-xs">Forgot Password</Link>
+                          <Link href="/auth/password/reset-password" className="text-xs">Forgot Password</Link>
                       </div>
                       <button className="border-2 border-green-600 rounded-full px-10 py-2 inline-block font-semibold hover:bg-green-600
                            hover:text-white">Login

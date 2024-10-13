@@ -151,7 +151,7 @@ class PasswordResetView(APIView):
         token = token_generator.make_token(user)
         uid = urlsafe_base64_encode(force_bytes(user.pk))
 
-        reset_link = f"http://127.0.0.1:8000/password-reset-confirm/{uid}/{token}/"
+        reset_link = f"http://localhost:3000/auth/password/reset-password-confirmation/?uid={uid}&token={token}/"
         send_mail(
             'Password Reset',
             f'Click the link to reset your password: {reset_link}',
@@ -163,29 +163,62 @@ class PasswordResetView(APIView):
         return Response({'message': 'Password reset link sent.'}, status=status.HTTP_200_OK)
 
 
-
 class PasswordResetConfirmView(APIView):
     permission_classes = (AllowAny,)
 
-    def post(self, request, uidb64, token):
+    def post(self, request):
+        uid = request.data.get('uid')
+        token = request.data.get('token')
+        new_password = request.data.get('new_password')
+        re_new_password = request.data.get('re_new_password')
+
+        print("Received UID:", uid)
+        print("Received Token:", token)
+        print("New Password:", new_password)
+        print("Re-New Password:", re_new_password)
+
+        if not all([uid, token, new_password, re_new_password]):
+            return Response({'error': 'All fields are required.'}, status=status.HTTP_400_BAD_REQUEST)
+
         try:
-            uid = urlsafe_base64_decode(uidb64).decode()
-            user = User.objects.get(pk=uid)
-        except (TypeError, ValueError, OverflowError, User.DoesNotExist):
-            return Response({'error': 'Invalid token or user ID.'}, status=status.HTTP_400_BAD_REQUEST)
+            u_id = urlsafe_base64_decode(uid).decode()
+            user = User.objects.get(pk=u_id)
+        except User.DoesNotExist:
+            return Response({'error': 'Invalid user ID.'}, status=status.HTTP_400_BAD_REQUEST)
 
         token_generator = PasswordResetTokenGenerator()
         if not token_generator.check_token(user, token):
             return Response({'error': 'Invalid or expired token.'}, status=status.HTTP_400_BAD_REQUEST)
 
-        new_password = request.data.get('password')
-        if not new_password or len(new_password) < 8:
-            return Response({'error': 'Password must be at least 8 characters long.'}, status=status.HTTP_400_BAD_REQUEST)
-
         user.set_password(new_password)
         user.save()
-
+        
         return Response({'message': 'Password has been reset successfully.'}, status=status.HTTP_200_OK)
+
+# class PasswordResetConfirmView(APIView):
+#     permission_classes = (AllowAny,)
+
+#     def post(self, request, uidb64, token):
+#         try:
+#             uid = urlsafe_base64_decode(uidb64).decode()
+#             user = User.objects.get(pk=uid)
+#         except (TypeError, ValueError, OverflowError, User.DoesNotExist):
+#             return Response({'error': 'Invalid token or user ID.'}, status=status.HTTP_400_BAD_REQUEST)
+
+#         token_generator = PasswordResetTokenGenerator()
+#         if not token_generator.check_token(user, token):
+#             return Response({'error': 'Invalid or expired token.'}, status=status.HTTP_400_BAD_REQUEST)
+
+#         # Validate the password
+#         new_password = request.data.get('password')
+#         if not new_password or len(new_password) < 8:
+#             return Response({'error': 'Password must be at least 8 characters long.'}, status=status.HTTP_400_BAD_REQUEST)
+
+#         # Set the new password and save the user
+#         user.set_password(new_password)
+#         user.save()
+
+#         return Response({'message': 'Password has been reset successfully.'}, status=status.HTTP_200_OK)
 
 class DashboardView(generics.RetrieveAPIView):
     """

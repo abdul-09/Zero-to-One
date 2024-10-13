@@ -23,24 +23,35 @@ const ResetPasswordConfirmation = () => {
 
   // Extract UID and Token from URL
   useEffect(() => {
-    if (searchParams.get("uid") && searchParams.get("token")) {
-      setUid(searchParams.get("uid") as string);
-      setToken(searchParams.get("token") as string);
+    const extractedUid = searchParams.get("uid");
+    let extractedToken = searchParams.get("token");
+    console.log("Extracted UID:", extractedUid);
+    console.log("Extracted Token:", extractedToken);
+    if (extractedToken && extractedToken.endsWith("/")) {
+      extractedToken = extractedToken.slice(0, -1); 
+    }
+
+    if (extractedUid && extractedToken) {
+      setUid(extractedUid as string);
+      setToken(extractedToken as string);
     }
   }, [searchParams]);
 
   const onSubmit = async (data: FormData) => {
+    console.log("Submitting data:", { uid, token, new_password: data.password, re_new_password: data.password });
     try {
+      
       await resetPasswordConfirm(
-        data.password,
-        data.password,
-        token,
         uid,
+        token,
+        data.password,
+        data.password,
       ).res();
       alert("Password has been reset successfully.");
       router.push("/");
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     } catch (err) {
+      console.log(err)
       alert("Failed to reset password. Please try again.");
     }
   };

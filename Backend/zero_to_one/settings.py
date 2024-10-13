@@ -53,6 +53,7 @@ INSTALLED_APPS = [
     "allauth.socialaccount",
     "allauth.socialaccount.providers.google",
     "dj_rest_auth.registration",
+    "djoser",
     'drf_recaptcha',
 ]
 
@@ -139,6 +140,18 @@ ACCOUNT_EMAIL_REQUIRED = True
 REST_AUTH_REGISTER_SERIALIZERS = {
     "REGISTER_SERIALIZER": 'accounts.serializers.UserSerializer'
 }
+
+DJOSER = {
+    "PASSWORD_RESET_CONFIRM_URL": "auth/password/reset-password-confirmation/?uid{uid}&token={token}",
+    "ACTIVATION_URL": "#/activate/{uid}/{token}",
+    "SEND_ACTIVATION_EMAIL": False,
+    "SERIALIZERS": {},
+    "LOGIN_FIELD": "email",
+    "PASSWORD_RESET_CONFIRM_RETYPE": True,
+}
+
+SITE = 'Klima 360'
+DOMAIN = 'localhost:3000'
 
 # Database
 # https://docs.djangoproject.com/en/4.2/ref/settings/#databases
