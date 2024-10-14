@@ -16,4 +16,5 @@ python-decouple==3.8
 dj-database-url
 whitenoise[brotli]
 gunicorn
+djoser
 uvicorn
