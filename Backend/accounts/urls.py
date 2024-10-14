@@ -1,6 +1,7 @@
 # urls.py
 from django.urls import include, path, re_path
 from django.contrib import admin
+from django.contrib.staticfiles.urls import staticfiles_urlpatterns
 from rest_framework_simplejwt.views import TokenRefreshView
 from .views import (
     GoogleLoginCallback, LoginView,  LogoutView, PasswordResetView, PasswordResetConfirmView, RegisterView, ProfileUpdateView, DashboardView, EnrollTopicView,GoogleLoginView
@@ -34,3 +35,6 @@ urlpatterns = [
     # path('captcha/', include('captcha.urls')),
 
 ]
+
+
+urlpatterns += staticfiles_urlpatterns()

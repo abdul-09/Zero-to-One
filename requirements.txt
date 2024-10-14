@@ -13,3 +13,7 @@ dj-rest-auth
 drf-recaptcha
 django-cryptography==1.1
 python-decouple==3.8
+dj-database-url
+whitenoise[brotli]
+gunicorn
+uvicorn
