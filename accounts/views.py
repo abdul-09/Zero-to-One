@@ -151,7 +151,7 @@ class PasswordResetView(APIView):
         token = token_generator.make_token(user)
         uid = urlsafe_base64_encode(force_bytes(user.pk))
 
-        reset_link = f"http://localhost:3000/auth/password/reset-password-confirmation/?uid={uid}&token={token}/"
+        reset_link = f"https://frontdeploy-zero2one.vercel.app/auth/password/reset-password-confirmation/?uid={uid}&token={token}/"
         send_mail(
             'Password Reset',
             f'Click the link to reset your password: {reset_link}',
