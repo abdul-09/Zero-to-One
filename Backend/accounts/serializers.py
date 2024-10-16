@@ -53,41 +53,32 @@ class ProfileUpdateSerializer(serializers.ModelSerializer):
             instance.interested_topics.set(interested_topics)
         return instance
 
-class TrainingScheduleSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = TrainingSchedule
-        fields = ['id', 'title', 'description', 'start_time']
 
 class ResourceSerializer(serializers.ModelSerializer):
     class Meta:
         model = Resource
         fields = ['id', 'title', 'description', 'link']
 
+class TrainingScheduleSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = TrainingSchedule
+        fields = ['id', 'title', 'description', 'start_time']
+
+
 class UserDashboardSerializer(serializers.ModelSerializer):
-    enrolled_topics = InterestedTopicSerializer(source='interested_topics', many=True)
-    available_topics = serializers.SerializerMethodField()
+    enrolled_trainings = TrainingScheduleSerializer(many=True)
+    available_trainings = serializers.SerializerMethodField()
     resources = serializers.SerializerMethodField()
-    training_schedules = serializers.SerializerMethodField()
 
     class Meta:
         model = User
-        fields = [
-            'full_name', 'email', 'location', 'experience_level',
-            'enrolled_topics', 'available_topics', 'resources', 'training_schedules'
-        ]
+        fields = ['full_name', 'email', 'location', 'experience_level', 'enrolled_trainings', 'available_trainings', 'resources']
 
-    def get_available_topics(self, obj):
-        """Retrieve topics the user has not enrolled in."""
-        enrolled_topic_ids = obj.interested_topics.values_list('id', flat=True)
-        available_topics = InterestedTopic.objects.exclude(id__in=enrolled_topic_ids)
-        return InterestedTopicSerializer(available_topics, many=True).data
+    def get_available_trainings(self, obj):
+        enrolled_training_ids = obj.enrolled_trainings.values_list('id', flat=True)
+        available_trainings = TrainingSchedule.objects.exclude(id__in=enrolled_training_ids)
+        return TrainingScheduleSerializer(available_trainings, many=True).data
 
     def get_resources(self, obj):
-        """Retrieve resources for enrolled topics."""
-        resources = Resource.objects.filter(topic__in=obj.interested_topics.all())
+        resources = Resource.objects.filter(topic__trainingschedules__in=obj.enrolled_trainings.all())
         return ResourceSerializer(resources, many=True).data
-
-    def get_training_schedules(self, obj):
-        """Retrieve training schedules for enrolled topics."""
-        schedules = TrainingSchedule.objects.filter(topic__in=obj.interested_topics.all())
-        return TrainingScheduleSerializer(schedules, many=True).data
