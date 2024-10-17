@@ -52,6 +52,10 @@ class TrainingSchedule(models.Model):
     title = models.CharField(max_length=255)
     description = models.TextField()
     start_time = models.DateTimeField()
+    enrolled_users = models.ManyToManyField(User, related_name='enrolled_trainings', blank=True)
+
+    def __str__(self):
+        return self.title
 
     def __str__(self):
         return self.title

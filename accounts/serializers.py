@@ -76,15 +76,18 @@ class UserDashboardSerializer(serializers.ModelSerializer):
             'enrolled_topics', 'available_topics', 'resources', 'training_schedules'
         ]
 
-    def get_available_topics(self, obj):
-        """Retrieve topics the user has not enrolled in."""
-        enrolled_topic_ids = obj.interested_topics.values_list('id', flat=True)
-        available_topics = InterestedTopic.objects.exclude(id__in=enrolled_topic_ids)
-        return InterestedTopicSerializer(available_topics, many=True).data
+    def get_available_trainings(self, obj):
+        """Retrieve training schedules the user has not enrolled in."""
+        enrolled_training_ids = obj.enrolled_trainings.values_list('id', flat=True)
+        available_trainings = TrainingSchedule.objects.exclude(id__in=enrolled_training_ids)
+        return TrainingScheduleSerializer(available_trainings, many=True).data
+
 
     def get_resources(self, obj):
-        """Retrieve resources for enrolled topics."""
-        resources = Resource.objects.filter(topic__in=obj.interested_topics.all())
+        """Retrieve resources for enrolled trainings."""
+        # Get topics from the enrolled trainings
+        enrolled_topics = InterestedTopic.objects.filter(training_schedules__in=obj.enrolled_trainings.all())
+        resources = Resource.objects.filter(topic__in=enrolled_topics)
         return ResourceSerializer(resources, many=True).data
 
     def get_training_schedules(self, obj):

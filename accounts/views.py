@@ -25,7 +25,7 @@ from django.utils.http import urlsafe_base64_decode
 from django.utils.encoding import force_bytes
 from rest_framework import generics
 
-from .models import User, InterestedTopic
+from .models import TrainingSchedule, User, InterestedTopic
 from .serializers import ProfileUpdateSerializer, RegisterSerializer, UserDashboardSerializer
 
 class RegisterView(generics.CreateAPIView):
@@ -230,23 +230,20 @@ class DashboardView(generics.RetrieveAPIView):
     def get_object(self):
         return self.request.user
 
-class EnrollTopicView(APIView):
-    """
-    Enroll the authenticated user in a specified topic.
-    """
+class EnrollTrainingView(APIView):
     permission_classes = [IsAuthenticated]
 
-    def post(self, request, topic_id):
+    def post(self, request, training_id):
         user = request.user
         try:
-            topic = InterestedTopic.objects.get(id=topic_id)
-        except InterestedTopic.DoesNotExist:
-            return Response({"error": "Topic does not exist."}, status=status.HTTP_404_NOT_FOUND)
-        
+            training = TrainingSchedule.objects.get(id=training_id)
+        except TrainingSchedule.DoesNotExist:
+            return Response({"error": "Training does not exist."}, status=status.HTTP_404_NOT_FOUND)
+
         # Check if already enrolled
-        if user.interested_topics.filter(id=topic_id).exists():
-            return Response({"message": "Already enrolled in this topic."}, status=status.HTTP_400_BAD_REQUEST)
-        
+        if user.enrolled_trainings.filter(id=training_id).exists():
+            return Response({"message": "Already enrolled in this training."}, status=status.HTTP_400_BAD_REQUEST)
+
         # Enroll the user
-        user.interested_topics.add(topic)
-        return Response({"message": "Successfully enrolled in the topic."}, status=status.HTTP_200_OK)
+        user.enrolled_trainings.add(training)
+        return Response({"message": "Successfully enrolled in the training."}, status=status.HTTP_200_OK)
