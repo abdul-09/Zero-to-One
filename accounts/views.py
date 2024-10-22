@@ -25,8 +25,8 @@ from django.utils.http import urlsafe_base64_decode
 from django.utils.encoding import force_bytes
 from rest_framework import generics
 
-from .models import TrainingSchedule, User, InterestedTopic
-from .serializers import ProfileUpdateSerializer, RegisterSerializer, UserDashboardSerializer
+from .models import Resource, TrainingSchedule, User, InterestedTopic
+from .serializers import InterestedTopicSerializer, ProfileUpdateSerializer, RegisterSerializer, ResourceSerializer, TrainingScheduleSerializer, UserDashboardSerializer
 
 class RegisterView(generics.CreateAPIView):
     queryset = User.objects.all()
@@ -40,6 +40,17 @@ class ProfileUpdateView(generics.RetrieveUpdateAPIView):
 
     def get_object(self):
         return self.request.user
+class TopicView(generics.ListAPIView):
+    queryset = InterestedTopic.objects.all()
+    serializer_class = InterestedTopicSerializer
+
+class TrainingScheduleView(generics.ListAPIView):
+    queryset = TrainingSchedule.objects.all()
+    serializer_class = TrainingScheduleSerializer
+
+class ResourcesView(generics.ListAPIView):
+    queryset = Resource.objects.all()
+    serializer_class = ResourceSerializer
 
 class LoginView(TokenObtainPairView):
     permission_classes = (AllowAny,)

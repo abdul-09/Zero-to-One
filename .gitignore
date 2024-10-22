@@ -1,1 +1,6 @@
 .venv
+.env
+memo
+.next
+*.txt
+*.ts
