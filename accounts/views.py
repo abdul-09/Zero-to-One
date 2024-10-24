@@ -258,3 +258,24 @@ class EnrollTrainingView(APIView):
         # Enroll the user
         user.enrolled_trainings.add(training)
         return Response({"message": "Successfully enrolled in the training."}, status=status.HTTP_200_OK)
+    
+class TrainingResourcesView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request, training_id):
+        try:
+            # Fetch the training schedule
+            training = TrainingSchedule.objects.get(id=training_id)
+        except TrainingSchedule.DoesNotExist:
+            return Response({"error": "Training does not exist."}, status=status.HTTP_404_NOT_FOUND)
+
+        # Fetch the resources related to this training schedule
+        resources = Resource.objects.filter(training_schedule=training)
+        serialized_resources = ResourceSerializer(resources, many=True).data
+
+        # Return the resources in the response
+        return Response({
+            "training": training.title,
+            "resources": serialized_resources
+
+        }, status=status.HTTP_200_OK)

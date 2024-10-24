@@ -4,7 +4,7 @@ from django.contrib import admin
 from django.contrib.staticfiles.urls import staticfiles_urlpatterns
 from rest_framework_simplejwt.views import TokenRefreshView
 from .views import (
-    EnrollTrainingView, GoogleLoginCallback, LoginView,  LogoutView, PasswordResetView, PasswordResetConfirmView, RegisterView, ProfileUpdateView, DashboardView, GoogleLoginView, ResourcesView, TopicView, TrainingScheduleView
+    EnrollTrainingView, GoogleLoginCallback, LoginView,  LogoutView, PasswordResetView, PasswordResetConfirmView, RegisterView, ProfileUpdateView, DashboardView, GoogleLoginView, ResourcesView, TopicView, TrainingResourcesView, TrainingScheduleView
 )
 
 # path('auth/login/', TokenObtainPairView.as_view(), name='jwt-login'), LoginView,
@@ -31,8 +31,9 @@ urlpatterns = [
     path('password-reset-confirm/', PasswordResetConfirmView.as_view(), name='password_reset_confirm'),
     path('profile/', ProfileUpdateView.as_view(), name='profile-update'),
     path('topic/', TopicView.as_view(), name='interestedtopics'),
-    path('resource/', ResourcesView.as_view(), name='resources'),
+    path('resources/', ResourcesView.as_view(), name='resources'),
     path('trainings/', TrainingScheduleView.as_view(), name='schedule'),
+    path('training-resources/<int:training_id>/', TrainingResourcesView.as_view(), name='training-resources'),
     path('dashboard/', DashboardView.as_view(), name='dashboard'),
     path('enroll/<int:training_id>/', EnrollTrainingView.as_view(), name='enroll-training'),
     # path('captcha/', include('captcha.urls')),
