@@ -82,14 +82,10 @@ class ResourceSerializer(serializers.ModelSerializer):
 
 class TrainingScheduleSerializer(serializers.ModelSerializer):
     topic = serializers.SerializerMethodField()
-    
 
     class Meta:
         model = TrainingSchedule
         fields = ['id', 'topic', 'title', 'description', 'start_time']
-
-    def get_start_time(self, obj):
-        return obj.start_time
 
     def get_topic(self, obj):
         # Return the topic's name instead of the FK ID
