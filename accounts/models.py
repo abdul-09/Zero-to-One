@@ -25,16 +25,11 @@ class InterestedTopic(models.Model):
 
 
 class User(AbstractBaseUser, PermissionsMixin):
-    EXPERIENCE_CHOICES = [
-        ('beginner', 'Beginner'),
-        ('intermediate', 'Intermediate'),
-        ('experienced', 'Experienced'),
-    ]
     full_name = models.CharField(max_length=255)
     email = models.EmailField(unique=True)
     phone_number = models.CharField(max_length=15, null=True, blank=True)
     location = models.CharField(max_length=255, null=True, blank=True)
-    experience_level = models.CharField(max_length=50, choices=EXPERIENCE_CHOICES, null=True, blank=True)
+    experience_level = models.CharField(max_length=50, null=True, blank=True)
     interested_topics = models.ManyToManyField(InterestedTopic, blank=True)
     is_superuser = models.BooleanField(default=False)
     is_active = models.BooleanField(default=True)

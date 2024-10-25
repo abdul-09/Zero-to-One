@@ -26,20 +26,37 @@ from django.utils.encoding import force_bytes
 from rest_framework import generics
 
 from .models import Resource, TrainingSchedule, User, InterestedTopic
-from .serializers import InterestedTopicSerializer, ProfileUpdateSerializer, RegisterSerializer, ResourceSerializer, TrainingScheduleSerializer, UserDashboardSerializer
+from .serializers import InterestedTopicSerializer, ProfileSerializer, RegisterSerializer, ResourceSerializer, TrainingScheduleSerializer, UserDashboardSerializer
 
 class RegisterView(generics.CreateAPIView):
     queryset = User.objects.all()
     permission_classes = [AllowAny]
     serializer_class = RegisterSerializer
 
-class ProfileUpdateView(generics.RetrieveUpdateAPIView):
-    queryset = User.objects.all()
-    permission_classes = [AllowAny]
-    serializer_class = ProfileUpdateSerializer
+class ProfileUpdateView(APIView):
+    def post(self, request):
+        email = request.data.get('email')  # Fetch email from the request data
+        try:
+            user = User.objects.get(email=email)  # Find the user by email
+        except User.DoesNotExist:
+            return Response({"error": "User not found."}, status=status.HTTP_404_NOT_FOUND)
 
-    def get_object(self):
-        return self.request.user
+        # Now we update the user's profile
+        serializer = ProfileSerializer(instance=user, data=request.data, partial=True)
+        if serializer.is_valid():
+            result = serializer.save()
+
+            # Extract the 'first_time_profile' from the result
+            first_time_profile = result['first_time_profile']
+
+            return Response({
+                'message': 'Profile updated successfully!',
+                'first_time_profile': first_time_profile
+            }, status=status.HTTP_200_OK)
+
+        # Print or log serializer errors for debugging
+        print(serializer.errors)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 class TopicView(generics.ListAPIView):
     queryset = InterestedTopic.objects.all()
     serializer_class = InterestedTopicSerializer

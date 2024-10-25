@@ -39,19 +39,41 @@ class RegisterSerializer(serializers.Serializer):
         user = User.objects.create_user(**validated_data)
         return user
 
-class ProfileUpdateSerializer(serializers.ModelSerializer):
-    interested_topics = serializers.PrimaryKeyRelatedField(queryset=InterestedTopic.objects.all(), many=True)
+class ProfileSerializer(serializers.ModelSerializer):
+
+    interested_topics = serializers.ListField(
+        child=serializers.IntegerField(),  # Expect a list of integers (IDs)
+        required=False
+    )
 
     class Meta:
         model = User
-        fields = ['phone_number', 'location', 'experience_level', 'interested_topics']
+        fields = ['phone_number', 'location', 'experience_level', 'interested_topics', 'email']
 
     def update(self, instance, validated_data):
-        interested_topics = validated_data.pop('interested_topics', None)
-        instance = super().update(instance, validated_data)
-        if interested_topics:
-            instance.interested_topics.set(interested_topics)
-        return instance
+        # Determine if this is the first time the profile is being completed
+        first_time_profile = (
+            instance.phone_number is None and
+            instance.location is None and
+            instance.experience_level is None and
+            not instance.interested_topics.exists()
+        )
+
+        # Extract interested_topics from validated_data if present
+        interested_topics_data = validated_data.pop('interested_topics', None)
+
+        # Update non-many-to-many fields
+        for attr, value in validated_data.items():
+            setattr(instance, attr, value)
+
+        # Handle the many-to-many field 'interested_topics'
+        if interested_topics_data:
+            instance.interested_topics.set(interested_topics_data)  # Set the list of IDs directly
+
+        instance.save()
+
+        # Return the instance and whether it's the first time profile completion
+        return {'user': instance, 'first_time_profile': first_time_profile}
 
 class ResourceSerializer(serializers.ModelSerializer):
     class Meta:

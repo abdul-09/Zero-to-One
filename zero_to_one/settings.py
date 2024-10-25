@@ -13,8 +13,6 @@ import os
 import dj_database_url
 from pathlib import Path
 from datetime import timedelta
-from pickle import FALSE, TRUE
-from telnetlib import AUTHENTICATION
 from decouple import config
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
@@ -169,7 +167,7 @@ DOMAIN = 'localhost:3000'
 # }
 
 DATABASES = {
-    "default": dj_database_url.parse(os.environ.get("DATABASE_URL"))
+    "default": dj_database_url.parse(config("DATABASE_URL"))
 }
 # DATABASES = {
 #     'default': {
