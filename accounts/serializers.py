@@ -82,6 +82,7 @@ class ResourceSerializer(serializers.ModelSerializer):
 
 class TrainingScheduleSerializer(serializers.ModelSerializer):
     topic = serializers.SerializerMethodField()
+    start_time = serializers.DateField()
     
 
     class Meta:
@@ -89,7 +90,7 @@ class TrainingScheduleSerializer(serializers.ModelSerializer):
         fields = ['id', 'topic', 'title', 'description', 'start_time']
 
     def get_start_time(self, obj):
-        return obj.start_time.date() if obj.start_date else None
+        return obj.start_time
 
     def get_topic(self, obj):
         # Return the topic's name instead of the FK ID

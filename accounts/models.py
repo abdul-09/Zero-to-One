@@ -46,7 +46,7 @@ class TrainingSchedule(models.Model):
     topic = models.ForeignKey(InterestedTopic, on_delete=models.CASCADE, related_name='training_schedules')
     title = models.CharField(max_length=255)
     description = models.TextField()
-    start_time = models.DateTimeField()
+    start_time = models.DateField()
     enrolled_users = models.ManyToManyField(User, related_name='enrolled_trainings', blank=True)
 
 
