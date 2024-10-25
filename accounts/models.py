@@ -49,8 +49,6 @@ class TrainingSchedule(models.Model):
     start_time = models.DateField()
     enrolled_users = models.ManyToManyField(User, related_name='enrolled_trainings', blank=True)
 
-    def __str__(self):
-        return self.title
 
     def __str__(self):
         return self.title
