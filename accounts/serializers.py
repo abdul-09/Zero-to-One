@@ -82,6 +82,7 @@ class ResourceSerializer(serializers.ModelSerializer):
 
 class TrainingScheduleSerializer(serializers.ModelSerializer):
     topic = serializers.SerializerMethodField()
+    start_time = serializers.DateField() 
 
     class Meta:
         model = TrainingSchedule
