@@ -54,7 +54,7 @@ class TrainingSchedule(models.Model):
         return self.title
 
 class Resource(models.Model):
-    topic = models.ForeignKey(InterestedTopic, on_delete=models.CASCADE, related_name='resources')
+    schedule = models.ForeignKey(TrainingSchedule, on_delete=models.CASCADE, related_name='resources')
     title = models.CharField(max_length=255)
     description = models.TextField()
     link = models.URLField()
