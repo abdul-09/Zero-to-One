@@ -89,7 +89,7 @@ class TrainingScheduleSerializer(serializers.ModelSerializer):
         model = TrainingSchedule
         fields = ['id', 'topic', 'title', 'description', 'start_time']
 
-    def get_start_date(self, obj):
+    def get_start_time(self, obj):
         return obj.start_time.date() if obj.start_date else None
 
     def get_topic(self, obj):
