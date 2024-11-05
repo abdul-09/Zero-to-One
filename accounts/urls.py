@@ -4,7 +4,7 @@ from django.contrib import admin
 from django.contrib.staticfiles.urls import staticfiles_urlpatterns
 from rest_framework_simplejwt.views import TokenRefreshView
 from .views import (
-    EnrollTrainingView, GoogleLoginCallback, LoginView,  LogoutView, PasswordResetView, PasswordResetConfirmView, RegisterView, ProfileUpdateView, DashboardView, GoogleLoginView, ResourcesView, TopicView, TrainingResourcesView, TrainingScheduleView
+    EnrollTrainingView, GoogleLoginCallback, LoginView,  LogoutView, PasswordResetView, PasswordResetConfirmView, ProfileRetrieveView, RegisterView, ProfileUpdateView, DashboardView, GoogleLoginView, ResourcesView, TopicView, TrainingResourcesView, TrainingScheduleView
 )
 
 # path('auth/login/', TokenObtainPairView.as_view(), name='jwt-login'), LoginView,
@@ -29,6 +29,7 @@ urlpatterns = [
     path('logout/', LogoutView.as_view(), name='logout'),
     path('password-reset/', PasswordResetView.as_view(), name='password_reset'),
     path('password-reset-confirm/', PasswordResetConfirmView.as_view(), name='password_reset_confirm'),
+    path('api/profileUserDetails/', ProfileRetrieveView.as_view(), name='profile-retrieve'),
     path('profile/', ProfileUpdateView.as_view(), name='profile-update'),
     path('topic/', TopicView.as_view(), name='interestedtopics'),
     path('resources/', ResourcesView.as_view(), name='resources'),

@@ -51,12 +51,32 @@ class ProfileUpdateView(APIView):
 
             return Response({
                 'message': 'Profile updated successfully!',
+                "user": user,
                 'first_time_profile': first_time_profile
             }, status=status.HTTP_200_OK)
 
         # Print or log serializer errors for debugging
         print(serializer.errors)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+    
+class ProfileRetrieveView(APIView):
+    def get(self, request):
+        # Get the email from the query parameters
+        email = request.query_params.get('email')
+        
+        if not email:
+            return Response({"error": "Email is required to fetch the profile."}, status=status.HTTP_400_BAD_REQUEST)
+        
+        try:
+            # Find the user by email
+            user = User.objects.get(email=email)
+            serializer = ProfileSerializer(user)
+            return Response(serializer.data, status=status.HTTP_200_OK)
+        except User.DoesNotExist:
+            return Response({"error": "User not found."}, status=status.HTTP_404_NOT_FOUND)
+        except Exception as e:
+            return Response({"error": str(e)}, status=status.HTTP_400_BAD_REQUEST)
+
 class TopicView(generics.ListAPIView):
     queryset = InterestedTopic.objects.all()
     serializer_class = InterestedTopicSerializer
