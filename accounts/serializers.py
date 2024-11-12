@@ -122,7 +122,7 @@ class UserDashboardSerializer(serializers.ModelSerializer):
         enrolled_topics = obj.enrolled_trainings.values_list('topic', flat=True).distinct()
         
         # Retrieve resources related to those topics
-        resources = Resource.objects.filter(training_schedule__training_schedule__in=enrolled_topics)
+        resources = Resource.objects.filter(training_schedule__topic__in=enrolled_topics)
         return ResourceSerializer(resources, many=True).data
     
     def get_training_schedules(self, obj):
