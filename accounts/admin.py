@@ -41,9 +41,15 @@ def export_users_to_csv(modeladmin, request, queryset):
     response['Content-Disposition'] = 'attachment; filename="users.csv"'
     writer = csv.writer(response)
     writer.writerow(['ID', 'Full Name', 'Email', 'Phone Number', 'Location', 'Experience Level', 'Interested Topics'])
+    
 
     for user in queryset:
-        writer.writerow([user.id, user.full_name, user.email,user.phone_number, user.location, user.experience_level, user.interested_topics])
+        # Format the phone number as a string
+        phone_number = str(user.phone_number)
+        
+        # Handle the interested_topics field
+        interested_topics = ', '.join(user.interested_topics) if user.interested_topics else ''
+        writer.writerow([user.id, user.full_name, user.email, phone_number, user.location, user.experience_level, interested_topics])
 
     return response
 
