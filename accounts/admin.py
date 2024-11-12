@@ -40,10 +40,10 @@ def export_users_to_csv(modeladmin, request, queryset):
     response = HttpResponse(content_type='text/csv')
     response['Content-Disposition'] = 'attachment; filename="users.csv"'
     writer = csv.writer(response)
-    writer.writerow(['ID', 'Full Name', 'Email', 'Location', 'Experience Level'])
+    writer.writerow(['ID', 'Full Name', 'Email', 'Phone Number', 'Location', 'Experience Level', 'Interested Topics'])
 
     for user in queryset:
-        writer.writerow([user.id, user.full_name, user.email, user.location, user.experience_level])
+        writer.writerow([user.id, user.full_name, user.email,user.phone_number, user.location, user.experience_level, user.interested_topics])
 
     return response
 
