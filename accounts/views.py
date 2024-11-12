@@ -51,7 +51,6 @@ class ProfileUpdateView(APIView):
 
             return Response({
                 'message': 'Profile updated successfully!',
-                "user": user,
                 'first_time_profile': first_time_profile
             }, status=status.HTTP_200_OK)
 
