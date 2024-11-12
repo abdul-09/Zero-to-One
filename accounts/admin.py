@@ -48,7 +48,7 @@ def export_users_to_csv(modeladmin, request, queryset):
         phone_number = str(user.phone_number)
         
         # Handle the interested_topics field
-        interested_topics = ', '.join(user.interested_topics) if user.interested_topics else ''
+        interested_topics = ', '.join(user.interested_topics.values_list('name', flat=True)) if user.interested_topics.exists() else ''
         writer.writerow([user.id, user.full_name, user.email, phone_number, user.location, user.experience_level, interested_topics])
 
     return response
